@@ -5,16 +5,16 @@ date: "11/3/2019"
 output: github_document
 ---
 
-# Setup Code
+## Setup Code
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 
 ```
 
-# Problem 1
+## Problem 1
 
 Pulling in iris: 
 
@@ -25,6 +25,7 @@ iris_with_missing = iris %>%
   map_df(~replace(.x, sample(1:150, 20), NA)) %>%
   mutate(Species = as.character(Species))
 
+iris_with_missing
 ```
 
 Writing a function that fills in missing values:
@@ -33,12 +34,44 @@ Writing a function that fills in missing values:
 ```{r}
 output = vector("list", length = 5)
 
+# generate a logical vector, output
 for (i in 1:5) {
   output[[i]] = is.numeric(iris_with_missing[[i]])
 }
 output
 
+# if output = true, run a loop, calculating mean in each vector, then replacing blanks with the mean 
+
 ```
 
+
+```{r}
+output = vector("list", length = 5)
+
+for (i in 1:5) {
+  
+  if (is.numeric(iris_with_missing[[i]])) {
+    
+    x = iris_with_missing[[i]] %>% mean(na.rm = TRUE)
+    iris_with_missing[[i]] %>% replace(is.na(iris_with_missing[[i]]), x)
+    
+  } else if (is.character(iris_with_missing[[i]])) {
+    iris_with_missing[[i]] %>% replace(is.na(iris_with_missing[[i]]), "virginica")
+  }
+  
+}
+
+```
+
+
+
+```{r}
+x = iris_with_missing[[1]] %>% mean(na.rm = TRUE)
+
+replace(iris_with_missing[[1]], is.na(pull(iris_with_missing, "Sepal.Length")),x)
+
+pull(iris_with_missing, "Sepal.Length") %>% mean(na.rm = TRUE)
+
+```
 
 
