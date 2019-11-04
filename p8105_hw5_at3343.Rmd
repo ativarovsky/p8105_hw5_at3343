@@ -96,5 +96,36 @@ output
 ```
 
 
+## Problem 2
+
+Making dataframe with all file names. 
+
+```{r}
+files = list.files(path = "./data") 
+files
+
+```
+
+Look up R for Data Science chapter 21
+
+```{r}
+# map(files, read_csv())
+
+```
+
+
+
+Function needs to import the csv, do a pivot_longer so that week is a variable and reading is another variable. 
+
+```{r}
+read_csv("./data/con_01.csv") %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    names_prefix = "week_",
+    values_to = "value"
+  ) %>% 
+  view()
+```
 
 
