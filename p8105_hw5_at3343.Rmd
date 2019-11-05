@@ -121,7 +121,14 @@ Function that reads in data from vector "files" and saves the result as a new va
 read_num2 = function(x){
   
   str_c("./data/", x) %>% 
-    read_csv()
+    read_csv() %>% 
+    pivot_longer(
+      week_1:week_8,
+      names_to = "week",
+      names_prefix = "week_",
+      values_to = "value"
+      ) %>% 
+    mutate("patient_id" = str_remove(x, ".csv"))
 }
 
 ```
@@ -130,23 +137,13 @@ Map:
 
 ```{r}
 
-output = map(files, read_num2)
+output = map_df(files, read_num2)
 
 output
 ```
 
 
-Function needs to import the csv, do a pivot_longer so that week is a variable and reading is another variable. 
 
-```{r}
-read_csv("./data/con_01.csv") %>% 
-  pivot_longer(
-    week_1:week_8,
-    names_to = "week",
-    names_prefix = "week_",
-    values_to = "value"
-  ) %>% 
-  view()
-```
+
 
 
