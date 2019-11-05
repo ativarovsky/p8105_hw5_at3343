@@ -79,7 +79,7 @@ iris_replace = function(x){
 
 ```
 
-Now, apply the function to a for loop.
+Can do this with a for loop: 
 
 ```{r}
 output = vector("list", length = 5)
@@ -89,6 +89,13 @@ for (i in 1:5) {
   output[[i]] = iris_replace(iris_with_missing[[i]])
   
 }
+output
+```
+
+
+Now, just with a map statement.
+
+```{r}
 
 output = map_df(iris_with_missing, iris_replace)
 
@@ -101,18 +108,32 @@ output
 Making dataframe with all file names. 
 
 ```{r}
+
 files = list.files(path = "./data") 
 files
 
 ```
 
-Look up R for Data Science chapter 21
+Function that reads in data from vector "files" and saves the result as a new variable in the dataframe. 
 
 ```{r}
-# map(files, read_csv())
+
+read_num2 = function(x){
+  
+  str_c("./data/", x) %>% 
+    read_csv()
+}
 
 ```
 
+Map: 
+
+```{r}
+
+output = map(files, read_num2)
+
+output
+```
 
 
 Function needs to import the csv, do a pivot_longer so that week is a variable and reading is another variable. 
