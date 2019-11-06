@@ -3,6 +3,8 @@ title: "Homework 5"
 author: "Alice Tivarovsky"
 date: "11/3/2019"
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Setup Code
@@ -184,4 +186,28 @@ df_num2 %>%
 ```
 
 In the experiemntal arm, the values generally increase week over week. In the control arm, the values generally fluctuate around the same point without any observable upwards or downwards trend. 
+
+
+## Problem 3
+
+Setting the design elements: 
+
+```{r}
+n = 30
+beta_0 = 2
+x_i1 = rnorm(n, 0, 1)
+sd = 50 
+
+beta_1 = 0
+
+num_3 = tibble(
+  x_i1,
+  y = beta_0 + beta_1*x_i1 + rnorm(n, 0, sd)
+)
+
+num_3 %>% 
+  ggplot(aes(y = y, x = x_i1)) +
+  geom_point()
+```
+
 
