@@ -210,4 +210,39 @@ num_3 %>%
   geom_point()
 ```
 
+Now, writing a function. 
+
+```{r}
+n = 30
+beta_0 = 2
+x_i1 = rnorm(n, 0, 1)
+sd = 50 
+beta_1 = 0
+
+sim_slr = function(n, beta_0, beta_1) {
+  
+  sim_data = tibble(
+    x_i1,
+    y = beta_0 + beta_1*x_i1 + rnorm(n, 0, sd)
+  )
+  
+  ls_fit = lm(y ~ x_i1, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+```
+
+# 
+# ```{r}
+# sim_results = 
+#   rerun(100000, sim_slr(n, 2, 0)) %>% 
+#   bind_rows() %>% 
+#   broom::tidy()
+# 
+# sim_results
+```
+
 
