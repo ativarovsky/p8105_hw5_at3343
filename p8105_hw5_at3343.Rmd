@@ -8,9 +8,21 @@ output: github_document
 ## Setup Code
 
 ```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(viridis)
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+  out.width = "90%"
+)
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 ```
 
@@ -133,7 +145,7 @@ read_num2 = function(x){
 
 ```
 
-Map: 
+Map statement: 
 
 ```{r}
 
@@ -142,8 +154,34 @@ output = map_df(files, read_num2)
 output
 ```
 
+Make some updates to the data table. 
 
+```{r}
+df_num2 = 
+  output %>% 
+  mutate(
+    arm = str_replace(patient_id, "_..", ""), 
+    arm = as_factor(arm)
+  ) %>% 
+  select(
+    patient_id, arm, week, value
+  )
 
+df_num2
+```
 
+Making spaghetti plot of df_num2. 
 
+```{r}
+df_num2 %>% 
+  ggplot(aes(x = week, y = value)) + 
+  geom_line(aes(group = patient_id, color = arm)) + 
+   labs(
+    title = "Study Value by Week",
+    x = "Week",
+    y = "Value"
+   )
+```
+
+In the experiemntal arm, the values generally increase week over week. In the control arm, the values generally fluctuate around the same point without any observable upwards or downwards trend. 
 
