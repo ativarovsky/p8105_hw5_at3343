@@ -230,7 +230,7 @@ Now re-running the simulation for beta_1 values (1, 2, 3, 4, 5).
 sim_results_2 = 
   tibble(beta_1 = c(1:6)) %>% 
   mutate(
-    output_list = map(.x = beta_1, ~rerun(1000, sim_slr(n, beta_0 = 2, beta_1 = .x))),
+    output_list = map(.x = beta_1, ~rerun(10000, sim_slr(n, beta_0 = 2, beta_1 = .x))),
     estimate_list = map(output_list, bind_rows)) %>% 
   select(-output_list) %>% 
   unnest(estimate_list) 
@@ -238,3 +238,27 @@ sim_results_2 =
 sim_results_2
 ```
 
+Plot of true beta_1 vs proportion of times that the null was rejected. 
+
+```{r}
+sim_results_plot = 
+  sim_results_2 %>% 
+  group_by(beta_1) %>% 
+  summarise(n = n(), sig = sum(p.value < 0.05), prop = sig/n) %>% 
+  ggplot(aes(x = beta_1, y = prop)) +
+  geom_point() +
+  labs(
+    title = "Effect Size vs Power", 
+    x = "Effect Size", 
+    y = "Power"
+  ) +
+  scale_x_continuous(
+    breaks = c(1:6),
+    labels = c("1", "2", "3", "4", "5", "6")
+  )
+
+sim_results_plot
+
+```
+
+Based on the plot, as the effect size increases (i.e. as beta increases), the power also increases. 
