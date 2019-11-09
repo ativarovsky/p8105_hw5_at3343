@@ -217,7 +217,7 @@ Now running the simulation:
 ```{r}
 
 sim_results = 
-  rerun(100, sim_slr(n, beta_0 = 2, beta_1 = 0)) %>% 
+  rerun(10000, sim_slr(n, beta_0 = 2, beta_1 = 0)) %>% 
   bind_rows() 
 
 sim_results
@@ -261,4 +261,24 @@ sim_results_plot
 
 ```
 
-Based on the plot, as the effect size increases (i.e. as beta increases), the power also increases. 
+Based on the plot, as the effect size increases (i.e. as beta increases), the power also increases. The association does not quite appear to be linear, possibly logarithmic.  We note that the values for power are generally low, possibly owing to a small sample size. 
+
+Going back to sim_results_2: 
+
+```{r}
+sim_results_2 %>% 
+  group_by(beta_1) %>% 
+  summarise(n = n(), beta_hat_mean = mean(beta_1_hat)) %>% 
+  ggplot(aes(x = beta_1, y = beta_hat_mean)) +
+  geom_point()
+```
+
+```{r}
+sim_results_2 %>% 
+  filter(p.value < 0.05) %>% 
+  group_by(beta_1) %>% 
+  summarise(n = n(), beta_hat_mean = mean(beta_1_hat)) %>% 
+  ggplot(aes(x = beta_1, y = beta_hat_mean)) +
+  geom_point()
+```
+
