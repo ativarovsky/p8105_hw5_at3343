@@ -194,7 +194,7 @@ First the function:
 
 ```{r}
 n = 30
-sd = 50 
+sd = sqrt(50)
 beta_0 = 2
 
 
