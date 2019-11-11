@@ -31,7 +31,7 @@ set.seed(10)
 
 ## Problem 1
 
-Pulling in iris: 
+The code chunk below pulls in the iris dataset. 
 
 ```{r}
 
@@ -42,42 +42,7 @@ iris_with_missing = iris %>%
 iris_with_missing
 ```
 
-Writing a function that fills in missing values:
-
-
-```{r}
-output = vector("list", length = 5)
-
-# generate a logical vector, output
-for (i in 1:5) {
-  output[[i]] = is.numeric(iris_with_missing[[i]])
-}
-output
-
-# if output = true, run a loop, calculating mean in each vector, then replacing blanks with the mean 
-
-```
-
-
-```{r}
-output = vector("list", length = 5)
-
-for (i in 1:5) {
-  
-  if (is.numeric(iris_with_missing[[i]])) {
-    
-    x = iris_with_missing[[i]] %>% mean(na.rm = TRUE)
-    iris_with_missing[[i]] %>% replace(is.na(iris_with_missing[[i]]), x)
-    
-  } else if (is.character(iris_with_missing[[i]])) {
-    iris_with_missing[[i]] %>% replace(is.na(iris_with_missing[[i]]), "virginica")
-  }
-  
-}
-
-```
-
-Try defining a function: 
+Next, we define a funtion that replaces missing values for numeric and character variables. 
 
 ```{r}
 
@@ -93,21 +58,8 @@ iris_replace = function(x){
 
 ```
 
-Can do this with a for loop: 
 
-```{r}
-output = vector("list", length = 5)
-
-for (i in 1:5) {
-  
-  output[[i]] = iris_replace(iris_with_missing[[i]])
-  
-}
-output
-```
-
-
-Now, just with a map statement.
+Finally, we map the function to the dataset. 
 
 ```{r}
 
@@ -119,16 +71,16 @@ output
 
 ## Problem 2
 
-Making dataframe with all file names. 
+First, we make a dataframe comprised of the file names. 
 
 ```{r}
 
-files = list.files(path = "./data") 
+files = list.files(path = "./data")
 files
 
 ```
 
-Function that reads in data from vector "files" and saves the result as a new variable in the dataframe. 
+Next, we write a function that reads in data from vector "files" and saves the result as a new variable in the dataframe. 
 
 ```{r}
 
@@ -147,7 +99,7 @@ read_num2 = function(x){
 
 ```
 
-Map statement: 
+Then we map the function to the files vector. 
 
 ```{r}
 
@@ -156,7 +108,7 @@ output = map_df(files, read_num2)
 output
 ```
 
-Make some updates to the data table. 
+Next, we tidy the output data frame. 
 
 ```{r}
 df_num2 = 
@@ -172,7 +124,7 @@ df_num2 =
 df_num2
 ```
 
-Making spaghetti plot of df_num2. 
+Finally, we construct a spaghetti plot of df_num2. 
 
 ```{r}
 df_num2 %>% 
@@ -190,11 +142,11 @@ In the experiemntal arm, the values generally increase week over week. In the co
 
 ## Problem 3
 
-First the function: 
+First, we write a function that generates simulation data and fits a linear model.  
 
 ```{r}
 n = 30
-sd = sqrt(50)
+sdev = sqrt(50) 
 beta_0 = 2
 
 
@@ -202,17 +154,21 @@ sim_slr = function(n, beta_0 = 2, beta_1 = 0) {
   
   sim_data = tibble(
     x_i1 = rnorm(n, 0, 1),
-    y = beta_0 + beta_1*x_i1 + rnorm(n, 0, sd)
+    y = beta_0 + beta_1*x_i1 + rnorm(n, 0, sdev)
   )
   
-ls_fit = lm(y ~ x_i1, data = sim_data) %>% broom::tidy() %>% filter(term == "x_i1") %>% select("estimate", "p.value") %>% rename(beta_1_hat = estimate)
+ls_fit = lm(y ~ x_i1, data = sim_data) %>% 
+  broom::tidy() %>% 
+  filter(term == "x_i1") %>% 
+  select("estimate", "p.value") %>% 
+  rename(beta_1_hat = estimate)
 
 }
 
 ```
 
 
-Now running the simulation: 
+Next we run the simulation for beta_1 = 0: 
  
 ```{r}
 
@@ -223,6 +179,7 @@ sim_results =
 sim_results
 
 ```
+
 
 Now re-running the simulation for beta_1 values (1, 2, 3, 4, 5). 
 
@@ -237,6 +194,7 @@ sim_results_2 =
 
 sim_results_2
 ```
+
 
 Plot of true beta_1 vs proportion of times that the null was rejected. 
 
@@ -261,24 +219,44 @@ sim_results_plot
 
 ```
 
-Based on the plot, as the effect size increases (i.e. as beta increases), the power also increases. The association does not quite appear to be linear, possibly logarithmic.  We note that the values for power are generally low, possibly owing to a small sample size. 
+Based on the plot, as the effect size increases (i.e. as beta increases), the power also increases, appraoching but not reaching the maximum value of 1.00 (100% power). 
 
-Going back to sim_results_2: 
+Now, plotting the results for true beta vs calculated beta, followed by the same plot restricted to beta values that are statistically significant at alpha = 0.05. 
 
 ```{r}
 sim_results_2 %>% 
   group_by(beta_1) %>% 
   summarise(n = n(), beta_hat_mean = mean(beta_1_hat)) %>% 
   ggplot(aes(x = beta_1, y = beta_hat_mean)) +
-  geom_point()
+  geom_point() +
+  labs(
+    title = "Mean Beta Estimate vs True Beta", 
+    x = "True beta1", 
+    y = "Mean Estimated beta1"
+  ) +
+  scale_x_continuous(
+    breaks = c(1:6),
+    labels = c("1", "2", "3", "4", "5", "6")
+  )
 ```
 
 ```{r}
+
 sim_results_2 %>% 
   filter(p.value < 0.05) %>% 
   group_by(beta_1) %>% 
   summarise(n = n(), beta_hat_mean = mean(beta_1_hat)) %>% 
   ggplot(aes(x = beta_1, y = beta_hat_mean)) +
-  geom_point()
+  geom_point() +
+  labs(
+    title = "Mean Beta Estimate vs True Beta, restricted to p values less than 0.05", 
+    x = "True beta1", 
+    y = "Mean of Estimated beta1"
+  ) +
+  scale_x_continuous(
+    breaks = c(1:6),
+    labels = c("1", "2", "3", "4", "5", "6")
+  )
 ```
 
+We observe that the first plot for unrestricted p-values is more precise as far as the calculated beta vs the true beta, meaning that the average of the estimated betas equals the true value at every point. When we restrict the betas to only those significantly different from the true beta, the results are less precise. This is because by filtering only significant results, we are eliminating values close to the true beta and keeping only values that diverge significantly from the true beta. As such, the relationship between the mean estimated beta and the true beta is not the precise one-to-one relationship seen in the unfiltered plot. 
